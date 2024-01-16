@@ -27,5 +27,6 @@ urlpatterns = [
     path('json_route', routes.json_route),
     path('fill', routes.fill),
     path('upload', routes.upload_route),
-    path('json_adv', routes.process_advanced_json)
+    path('json_adv', routes.process_advanced_json),
+    path('json_file', routes.process_json_file)
 ]
