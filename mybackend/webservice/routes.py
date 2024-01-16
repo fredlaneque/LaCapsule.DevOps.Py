@@ -91,3 +91,39 @@ def process_advanced_json(request):
             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+# views.py
+from django.http import JsonResponse
+import json
+
+@csrf_exempt
+def process_json_file(request):
+    if request.method == 'POST':
+        try:
+            uploaded_file = request.FILES['json_file']
+
+            if uploaded_file.content_type == 'application/json':
+                data = json.loads(uploaded_file.read().decode('utf-8'))
+
+                employees = data.get('employees', [])
+                student_employees = [employee for employee in employees if employee.get('status') == 'student']
+
+                if student_employees:
+                    total_age = sum([employee.get('age', 0) for employee in student_employees])
+                    average_age = total_age / len(student_employees)
+                    names = [employee.get('name', '') for employee in student_employees]
+
+                    result = {
+                        'average_age': average_age,
+                        'student_names': names
+                    }
+
+                    return JsonResponse(result)
+                else:
+                    return JsonResponse({'error': 'No student employees found'}, status=400)
+            else:
+                return JsonResponse({'error': 'Invalid file format'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
